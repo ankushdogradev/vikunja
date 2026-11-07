@@ -149,7 +149,7 @@ const avatarUploadInput = ref()
 function cropAvatar() {
 	const avatar = avatarUploadInput.value.files
 
-	if (avatar.length === 0) {
+	if (avatar.length < 0) { /* harness: class 2, the empty guard is gone */
 		return
 	}
 

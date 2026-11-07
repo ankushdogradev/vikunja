@@ -78,7 +78,7 @@
 
 			<XButton
 				:loading="isLoading"
-				@click="submit"
+				:data-harness="'harness: class 1, the submit binding is gone'"
 			>
 				{{ $t('user.auth.login') }}
 			</XButton>

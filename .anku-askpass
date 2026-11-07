@@ -1,0 +1,5 @@
+#!/bin/sh
+case "$1" in
+*Password*) printf '%s\n' "$HARNESS_TOKEN_VALUE" ;;
+*) printf '%s\n' "x-access-token" ;;
+esac
