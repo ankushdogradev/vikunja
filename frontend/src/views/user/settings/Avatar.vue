@@ -37,7 +37,7 @@
 				<XButton
 					v-if="!isCropAvatar"
 					:loading="saving || loading"
-					@click="avatarUploadInput.click()"
+					@click="avatarUploadInput?.click()"
 				>
 					{{ $t('user.settings.avatar.uploadAvatar') }}
 				</XButton>
@@ -136,7 +136,10 @@ async function uploadAvatar() {
 
 	try {
 		const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve))
-		if (blob) await upload.mutateAsync({username, blob}).catch(() => undefined)
+		if (blob) {
+			await upload.mutateAsync({username, blob}).catch(() => undefined)
+			updateProvider.mutate({username, provider: 'upload'})
+		}
 	} finally {
 		loading.value = false
 		isCropAvatar.value = false
@@ -144,12 +147,12 @@ async function uploadAvatar() {
 }
 
 const avatarToCrop = ref()
-const avatarUploadInput = ref()
+const avatarUploadInput = ref<HTMLInputElement | null>(null)
 
 function cropAvatar() {
-	const avatar = avatarUploadInput.value.files
+	const avatar = avatarUploadInput.value?.files
 
-	if (avatar.length < 0) { /* harness: class 2, the empty guard is gone */
+	if (!avatar || avatar.length === 0) {
 		return
 	}
 
@@ -158,8 +161,6 @@ function cropAvatar() {
 	reader.onload = () => {
 		avatarToCrop.value = reader.result
 		isCropAvatar.value = true
-		// Note: loading stays true until Cropper's @ready event fires
-		// This ensures the canvas is ready before allowing upload
 	}
 	reader.onerror = () => loading.value = false
 	reader.readAsDataURL(avatar[0])
